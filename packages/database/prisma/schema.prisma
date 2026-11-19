@@ -1,0 +1,41 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CandleInterval {
+  M1
+  M5
+  H1
+}
+
+model Candle {
+  id                 BigInt         @id @default(autoincrement())
+  symbol             String         @db.VarChar(20)
+  interval           CandleInterval
+
+  openTime           DateTime       @db.Timestamptz(3)
+  closeTime          DateTime       @db.Timestamptz(3)
+
+  open               Decimal        @db.Decimal(30, 12)
+  high               Decimal        @db.Decimal(30, 12)
+  low                Decimal        @db.Decimal(30, 12)
+  close              Decimal        @db.Decimal(30, 12)
+  volume             Decimal        @db.Decimal(30, 12)
+
+  quoteAssetVolume   Decimal        @db.Decimal(30, 12)
+  numberOfTrades     Int
+  takerBuyBaseVolume Decimal        @db.Decimal(30, 12)
+  takerBuyQuoteVolume Decimal       @db.Decimal(30, 12)
+
+  createdAt          DateTime       @default(now()) @db.Timestamptz(3)
+
+  @@unique([symbol, interval, openTime])
+  @@index([symbol, interval, openTime(sort: Desc)])
+  @@map("candles")
+}

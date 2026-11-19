@@ -1,0 +1,13 @@
+{
+  "name": "@trafind/worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@trafind/database": "workspace:*",
+    "ws": "^8.23.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.18.2"
+  }
+}

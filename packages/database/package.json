@@ -1,0 +1,28 @@
+{
+  "name": "@trafind/database",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p ./tsconfig.json",
+    "generate": "prisma generate",
+    "migrate:dev": "prisma migrate dev"
+  },
+  "devDependencies": {
+    "prisma": "7.10.1"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "dotenv": "^18.0.10",
+    "pg": "^8.23.1"
+  }
+}

@@ -5,6 +5,7 @@
 export {
   saveMany,
   findLatest,
-  findCandleOpenTimes
+  findCandleOpenTimes,
+  findLatestCandles
 } from "./repositories/candle.repository.js";
 export { prisma } from "./client.js";

@@ -57,3 +57,22 @@ export async function findCandleOpenTimes(
     }
   });
 }
+
+export async function findLatestCandles(
+  symbol: string,
+  interval: CandleInterval,
+  limit: number
+) {
+  const candles = await prisma.candle.findMany({
+    where: {
+      symbol,
+      interval
+    },
+    orderBy: {
+      openTime: "desc"
+    },
+    take: limit
+  });
+
+  return candles.reverse();
+}

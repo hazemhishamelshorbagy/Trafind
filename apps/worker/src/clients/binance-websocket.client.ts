@@ -1,3 +1,7 @@
+/**
+ * What: Maintains the Binance live-kline WebSocket connection.
+ * Why: Processes closed candles, buffers during recovery, heartbeats, and reconnects safely.
+ */
 import WebSocket from "ws";
 import { processLiveCandle } from "../services/live-candle.service.js";
 import { recoverMissingCandles } from "../services/data-recovery.service.js";

@@ -1,3 +1,7 @@
+/**
+ * What: Defines shared Binance REST, WebSocket, interval, and mapped-candle types.
+ * Why: Gives ingestion code a consistent, typed contract for external market data.
+ */
 export type BinanceInterval = "1m" | "5m" | "1h";
 
 export type BinanceKline = [

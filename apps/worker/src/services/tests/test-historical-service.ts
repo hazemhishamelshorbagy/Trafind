@@ -1,4 +1,8 @@
-import { collectAndSaveHistoricalData } from "./historical-data.service.js";
+/**
+ * What: Manually runs historical collection and database saving.
+ * Why: Smoke-tests collection, validation, mapping, and persistence.
+ */
+import { collectAndSaveHistoricalData } from "../historical-data.service.js";
 
 async function main() {
   const endTime = Date.now() - 60_000;

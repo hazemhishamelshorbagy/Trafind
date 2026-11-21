@@ -1,3 +1,7 @@
+/**
+ * What: Runs a minimal PostgreSQL connectivity check.
+ * Why: Helps diagnose database configuration and credentials outside the application.
+ */
 import "dotenv/config";
 import { prisma } from "./client.js";
 

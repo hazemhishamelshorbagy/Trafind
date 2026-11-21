@@ -1,3 +1,7 @@
+/**
+ * What: Handles market-candle HTTP requests and validates query parameters.
+ * Why: Separates request validation and response formatting from route registration.
+ */
 import type { RequestHandler } from "express";
 import { candlesQuerySchema } from "../schemas/validation-schema.js";
 

@@ -1,3 +1,7 @@
+/**
+ * What: Streams Binance historical kline pages using an advancing time cursor.
+ * Why: Handles large ranges without loading every candle into memory at once.
+ */
 import {
   getKlines, 
 } from "../clients/binance.client.js";

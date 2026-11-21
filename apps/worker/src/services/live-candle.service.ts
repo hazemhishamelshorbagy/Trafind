@@ -1,7 +1,11 @@
+/**
+ * What: Processes only closed Binance WebSocket candles and saves them to PostgreSQL.
+ * Why: Prevents partial live updates from being stored and adds retry protection to writes.
+ */
 import {
   mapWebSocketMessageToKline,
 } from "../mappers/binance-websocket.mapper.js";
-
+import { retry } from "../utils/retry.js";
 import { mapBinanceKline } from "../mappers/binance.mapper.js";
 import { BinanceWebSocketMessage } from "../types/market.types.js";
 
@@ -41,7 +45,13 @@ export async function processLiveCandle(
     interval: INTERVAL_MAP[candle.interval]
   };
 
-  const saved = await saveMany([databaseCandle]);
+ const saved = await retry(
+  () => saveMany([databaseCandle]),
+  {
+    retries: 2,
+    delay: 1000
+  }
+);
 
   console.log("Closed candle processed:", {
     symbol: candle.symbol,

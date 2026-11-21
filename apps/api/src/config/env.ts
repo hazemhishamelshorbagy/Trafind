@@ -1,3 +1,7 @@
+/**
+ * What: Defines and validates environment variables used by the API.
+ * Why: Ensures invalid ports or environments fail early with safe defaults.
+ */
 import "dotenv/config";
 import { z } from "zod";
 

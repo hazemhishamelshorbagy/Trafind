@@ -1,3 +1,7 @@
+/**
+ * What: Recovers candles after the latest candle stored in PostgreSQL.
+ * Why: Repairs gaps caused by worker downtime or a dropped live-WebSocket connection.
+ */
 import { findLatest } from "@trafind/database";
 import { collectAndSaveHistoricalData } from "./historical-data.service.js";
 import { BinanceInterval } from "../types/market.types.js";

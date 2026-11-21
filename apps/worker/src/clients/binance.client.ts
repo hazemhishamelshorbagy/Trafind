@@ -1,6 +1,22 @@
+/**
+ * What: Requests historical kline pages from Binance's public REST data API.
+ * Why: Keeps HTTP request construction and response validation out of collection services.
+ */
+import { retry } from "../utils/retry.js";
 import type { GetKlinesParams, BinanceKline } from "../types/market.types.js";
-
+const REQUEST_TIMEOUT = 10_000;
 const BINANCE_BASE_URL = "https://data-api.binance.vision";
+
+class BinanceApiError extends Error {
+  constructor(
+    public readonly status: number,
+    statusText: string
+  ) {
+    super(`Binance API error: ${status} ${statusText}`);
+    this.name = "BinanceApiError";
+  }
+}
+
 export async function getKlines({
   symbol,
   interval,
@@ -22,15 +38,35 @@ export async function getKlines({
     params.set("endTime", String(endTime));
   }
 
-  const response = await fetch(
-    `${BINANCE_BASE_URL}/api/v3/klines?${params}`
-  );
+  const url = `${BINANCE_BASE_URL}/api/v3/klines?${params}`;
 
-  if (!response.ok) {
-    throw new Error(
-      `Binance API error: ${response.status} ${response.statusText}`
-    );
-  }
+  const response = await retry(
+    async () => {
+      const result = await fetch(url, {
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT)
+      });
+
+      if (!result.ok) {
+        throw new BinanceApiError(
+          result.status,
+          result.statusText
+        );
+      }
+
+      return result;
+    },
+    {
+      retries: 2,
+      delay: 1000,
+      shouldRetry: (error) => {
+        if (error instanceof BinanceApiError) {
+          return error.status === 429 || error.status >= 500;
+        }
+
+        return true;
+      }
+    }
+  );
 
   const data: unknown = await response.json();
 

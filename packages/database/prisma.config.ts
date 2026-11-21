@@ -1,3 +1,5 @@
+// What: Configures Prisma schema location and PostgreSQL connection for CLI operations.
+// Why: Keeps migrations and client generation consistent across database scripts.
 import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
 

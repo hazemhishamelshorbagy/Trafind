@@ -1,3 +1,7 @@
+/**
+ * What: Defines the database-ready shape of a mapped Binance candle.
+ * Why: Keeps repository input types explicit and prevents interval or field mismatches.
+ */
 type CandleInterval = "M1" | "M5" | "H1";
 export interface SaveCandleInput {
   symbol: string;

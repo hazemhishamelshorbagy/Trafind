@@ -1,3 +1,7 @@
+/**
+ * What: Manually tests candle repository save and latest-candle operations.
+ * Why: Validates database behavior and cleans up its temporary test row afterward.
+ */
 import "dotenv/config";
 import { prisma } from "./client.js";
 import {

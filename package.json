@@ -1,7 +1,8 @@
 {
-  "name": "@trafind/database",
+  "name": "trafind",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@12.21.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -20,6 +21,7 @@
     "@types/node": "^26.6.6",
     "prisma": "7.10.1",
     "tsx": "^4.23.15",
+    "turbo": "^2.11.13",
     "typescript": "^5.0.0"
   },
   "dependencies": {

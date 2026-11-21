@@ -1,3 +1,7 @@
+/**
+ * What: Implements database operations for saving and finding candles.
+ * Why: Centralizes Prisma queries so worker services do not depend on ORM details.
+ */
 import { prisma } from "../client.js";
 import { CandleInterval } from "../generated/prisma/enums.js";
 import { SaveCandleInput } from "../types/data-binance.types.js";
@@ -26,6 +30,30 @@ export async function findLatest(
     },
     orderBy: {
       openTime: "desc"
+    }
+  });
+}
+
+export async function findCandleOpenTimes(
+  symbol: string,
+  interval: CandleInterval,
+  startTime: Date,
+  endTime: Date
+) {
+  return prisma.candle.findMany({
+    where: {
+      symbol,
+      interval,
+      openTime: {
+        gte: startTime,
+        lte: endTime
+      }
+    },
+    select: {
+      openTime: true
+    },
+    orderBy: {
+      openTime: "asc"
     }
   });
 }

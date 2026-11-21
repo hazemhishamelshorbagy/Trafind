@@ -1,3 +1,7 @@
+/**
+ * What: Handles requests that do not match a registered API route.
+ * Why: Returns a predictable 404 JSON response instead of Express's default HTML.
+ */
 import type { RequestHandler } from "express";
 
 export const notFoundHandler: RequestHandler = (req, res) => {

@@ -1,4 +1,7 @@
-
+/**
+ * What: Declares and validates market-candle query parameters with Zod.
+ * Why: Applies allowed symbols, intervals, limits, defaults, and type coercion centrally.
+ */
 import { z } from "zod";
 
 export const candlesQuerySchema = z.object({

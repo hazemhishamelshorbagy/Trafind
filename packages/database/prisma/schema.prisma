@@ -1,3 +1,5 @@
+// What: Defines the PostgreSQL database schema for market candles.
+// Why: Documents interval enums, OHLC fields, indexes, and duplicate protection.
 generator client {
   provider            = "prisma-client"
   output              = "../src/generated/prisma"

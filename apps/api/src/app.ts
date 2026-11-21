@@ -1,3 +1,7 @@
+/**
+ * What: Configures the Express application, middleware, routes, and HTTP port.
+ * Why: Keeps API startup wiring separate from the server process entry point.
+ */
 import express from "express";
 import { env } from "./config/env.js";
 import healthRouter from "./routes/health.routes.js";

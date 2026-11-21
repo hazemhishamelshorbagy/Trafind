@@ -1,9 +1,13 @@
-import { getKlines } from "./clients/binance.client.js";
-import { mapBinanceKline } from "./mappers/binance.mapper.js";
+/**
+ * What: Manually exercises the Binance REST klines client.
+ * Why: Provides a direct smoke check for network access and response formatting.
+ */
+import { getKlines } from "../binance.client.js";
+import { mapBinanceKline } from "../../mappers/binance.mapper.js";
 import {
   validateCandle,
   isCandleClosed,
-} from "./validators/candle.validator.js";
+} from "../../validators/candle.validator.js";
 
 // // candles
 //   ├── candles[0]  ← أول شمعة

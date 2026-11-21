@@ -1,4 +1,8 @@
-import { collectHistoricalKlines } from "./collectors/historical-data.collector.js";
+/**
+ * What: Manually runs the paginated historical kline collector.
+ * Why: Smoke-tests paging behavior and the collected candle count.
+ */
+import { collectHistoricalKlines } from "../../collectors/historical-data.collector.js";
 
 async function main() {
   const endTime = Date.now() - 60_000;

@@ -14,9 +14,16 @@ The completed pipeline currently covers:
 - Missing-candle detection and automatic repair
 - Scheduled historical-data quality checks
 - API request validation
+- Market-features calculation
+- Simple and exponential moving averages
+- Relative Strength Index (RSI)
+- Average True Range (ATR)
+- MACD and its signal and histogram
+- Historical volatility and percentage returns
 
-Feature engineering, pattern discovery, hypothesis testing, and backtesting
-are described in [docs/cycle.md](docs/cycle.md) but are not implemented yet.
+The indicator modules are calculated from closed candle data in PostgreSQL.
+Pattern discovery, hypothesis testing, and backtesting are described in
+[docs/cycle.md](docs/cycle.md) but are not implemented yet.
 
 ## Project status
 
@@ -34,6 +41,14 @@ are described in [docs/cycle.md](docs/cycle.md) but are not implemented yet.
 - Automatic startup repair and a periodic repair scheduler
 - Graceful worker shutdown for `SIGINT` and `SIGTERM`
 - API health endpoint and market-candle query validation
+- Candle price, range, wick, and volume features
+- Percentage returns
+- Simple Moving Average (SMA)
+- Exponential Moving Average (EMA)
+- Relative Strength Index (RSI)
+- Average True Range (ATR)
+- Moving Average Convergence Divergence (MACD)
+- Population-standard-deviation historical volatility
 
 ### Current API and worker boundaries
 
@@ -97,12 +112,313 @@ flowchart TD
     F --> G
 ```
 
+## Understanding the quantitative indicators
+
+The quantitative foundation turns a list of candles into smaller numbers that
+describe trend, momentum, price movement, and volatility. All calculations
+use JavaScript numbers derived from Prisma decimal values. These indicators
+help organize market behavior; they do not predict the future or guarantee a
+profit.
+
+### A candle in simple language
+
+An OHLCV candle is a small market summary for one time period, such as one
+minute.
+
+| Term | Meaning |
+| --- | --- |
+| Open | The first traded price in the period |
+| High | The highest traded price in the period |
+| Low | The lowest traded price in the period |
+| Close | The final traded price in the period |
+| Volume | How much of the base asset was traded |
+
+For example, a one-minute candle might open at 100, rise to 108, fall to 97,
+and close at 105. It answers five questions: where did the period start,
+which way did it move, how far did it go, where did it end, and how much was
+traded?
+
+### Market features
+
+The market-feature module in
+[apps/worker/src/quantative/market-features.ts](apps/worker/src/quantative/market-features.ts)
+calculates a summary for one candle.
+
+#### Price change
+
+```text
+price change = close - open
+```
+
+The sign tells the direction. A positive result means the candle closed above
+where it opened; a negative result means it closed below. A result of 0 means
+that the close and open were equal.
+
+#### Percentage price change
+
+```text
+percentage price change = (close - open) / open * 100
+```
+
+This makes the change comparable between assets and prices. A change from 100
+to 105 is +5%, while a change from 1,000 to 1,050 is also +5%, even though
+the dollar amount is 10 times larger.
+
+#### Candle range
+
+```text
+candle range = high - low
+candle range percent = candle range / open * 100
+```
+
+The range is the distance between the highest and lowest prices during the
+candle. The percent form is useful for comparing large and small-priced assets.
+
+#### Candle body
+
+```text
+body size = absolute value of (close - open)
+```
+
+The body shows how far the candle moved from open to close. A long body means
+the market moved strongly in one direction. A short body means the open and
+close were close together.
+
+#### Wicks
+
+```text
+upper wick = high - max(open, close)
+lower wick = min(open, close) - low
+```
+
+Wicks show how far price moved beyond the candle body.
+
+- The upper wick measures movement above the body's top.
+- The lower wick measures movement below the body's bottom.
+- Long wicks can show that buyers or sellers pushed price farther before the
+  candle ended.
+
+The implementation also validates the candle: prices must be finite and
+positive, volume cannot be negative, the high must include both the open and
+close, and the low must be below or equal to both.
+
+### Percentage returns
+
+The return module in
+[apps/worker/src/quantative/returns.ts](apps/worker/src/quantative/returns.ts)
+compares every closing price with the close immediately before it.
+
+```text
+return = (current close - previous close) / previous close * 100
+```
+
+For example, closes of 100 and 110 give:
+
+```text
+(110 - 100) / 100 * 100 = +10%
+```
+
+This is called a percentage return, not a raw price change. It answers how much
+the position gained or lost relative to its previous value.
+
+### Simple Moving Average (SMA)
+
+The SMA module in
+[apps/worker/src/quantative/moving-averages.ts](apps/worker/src/quantative/moving-averages.ts)
+adds the closing prices inside a moving time window and divides by the window
+length.
+
+```text
+SMA = sum of closing prices in the window / number of closing prices
+```
+
+For closes 10, 12, 14, 16, and 18 with a period of 3:
+
+- First window: (10 + 12 + 14) / 3 = 12
+- Next window: (12 + 14 + 16) / 3 = 14
+- Final window: (14 + 16 + 18) / 3 = 16
+
+Think of the window as a sliding box. Each candle moves the box forward and
+drops the oldest candle. SMA is easy to understand, but every candle in the
+window has the same weight. It can react slowly to sudden price changes.
+
+### Exponential Moving Average (EMA)
+
+An EMA is also an average, but newer prices count more than older prices.
+It therefore reacts faster than an SMA.
+
+The code starts by calculating the SMA of the first period. It then multiplies
+the latest EMA by a smoothing factor and combines it with the new close:
+
+```text
+alpha = 2 / (period + 1)
+new EMA = (new close * alpha) + (previous EMA * (1 - alpha))
+```
+
+The first EMA in this module is an SMA, and later values are updated one
+candle at a time. A smaller period gives recent prices more influence and
+produces a faster line. A larger period produces a slower, smoother line.
+
+### Relative Strength Index (RSI)
+
+RSI in
+[apps/worker/src/quantative/rsi.ts](apps/worker/src/quantative/rsi.ts)
+measures whether recent closing-price changes are mostly gains or mostly losses.
+It converts that balance into a number from 0 to 100.
+
+First the code subtracts each close from the next close:
+
+```text
+positive change -> gain
+negative change -> loss
+no change -> gain and loss are both zero
+```
+
+It then calculates average gains and average losses and uses:
+
+```text
+relative strength = average gain / average loss
+RSI = 100 - 100 / (1 + relative strength)
+```
+
+Common interpretations:
+
+| RSI range | Simple meaning |
+| --- | --- |
+| Above 70 | Gains have recently been much stronger; often described as overbought |
+| 30 to 70 | Gains and losses are in a mixed or neutral range |
+| Below 30 | Losses have recently been much stronger; often described as oversold |
+
+These ranges are warnings or labels, not automatic buy or sell commands.
+An upward market can remain above 70, and a downward market can remain below
+30. The implementation smooths later averages by giving the previous average
+more weight and introducing the next gain or loss gradually.
+
+Special cases are handled safely:
+
+- No gain and no loss -> RSI 50
+- No losses, but gains exist -> RSI 100
+- No gains, but losses exist -> RSI 0
+
+### Average True Range (ATR)
+
+ATR in [apps/worker/src/quantative/atr.ts](apps/worker/src/quantative/atr.ts)
+measures how far price usually moves in one candle. It combines:
+
+1. The current candle's high minus low.
+2. The absolute difference between the current high and previous close.
+3. The absolute difference between the current low and previous close.
+
+```text
+true range = largest of those three values
+```
+
+Using the previous close prevents the calculation from ignoring a gap that
+opens outside the previous candle. The code averages the first `period` true
+ranges, then smooths them.
+
+```text
+smoothed ATR =
+(previous ATR * (period - 1) + current true range) / period
+```
+
+ATR is measured in the same units as price. An ATR of 2 on a 100-dollar asset
+means the average candle movement is about 2 dollars. ATR does not say whether
+price will rise or fall; it only describes recent movement size.
+
+It is commonly useful for:
+
+- Comparing how volatile two periods are
+- Setting movement-based stop or position-size rules
+- Showing that a quiet market became more active
+
+### Moving Average Convergence Divergence (MACD)
+
+MACD in [apps/worker/src/quantative/macd.ts](apps/worker/src/quantative/macd.ts)
+compares a fast EMA with a slow EMA. The default values are 12, 26, and 9.
+
+```text
+MACD line = fast EMA - slow EMA
+signal line = EMA of the MACD line
+histogram = MACD line - signal line
+```
+
+The calculation works as follows:
+
+1. Calculate the 12-period EMA of the closing prices.
+2. Calculate the 26-period EMA.
+3. Subtract the slow EMA from the fast EMA to form the MACD line.
+4. Calculate a 9-period EMA of the MACD line to form the signal line.
+5. Subtract the signal line from the MACD line to form the histogram.
+
+Simple interpretations:
+
+- MACD above zero: the fast trend is above the slow trend.
+- MACD below zero: the fast trend is below the slow trend.
+- MACD crosses above the signal line: short-term momentum is turning stronger.
+- MACD crosses below the signal line: short-term momentum is weakening.
+- A positive histogram: MACD is above its signal line.
+- A negative histogram: MACD is below its signal line.
+
+Fast EMAs are more sensitive, so MACD can change often. It is especially
+likely to give false or late signals during sideways, noisy markets.
+
+### Historical volatility
+
+Historical volatility in
+[apps/worker/src/quantative/volatility.ts](apps/worker/src/quantative/volatility.ts)
+describes how spread out the return values were over the selected closing-price
+series.
+
+The basic statistical steps are:
+
+1. Calculate each percentage return.
+2. Calculate the average return.
+3. Subtract the average from every return.
+4. Square every difference.
+5. Average the squared differences; this is variance.
+6. Take the square root of variance; this is standard deviation.
+
+```text
+variance = average(squared difference from the mean)
+volatility = square root(variance)
+```
+
+Squaring makes negative and positive differences equally important and gives
+larger moves more weight. A small volatility means the returns were close to
+their average. A large volatility means the returns were more spread out.
+
+The module currently returns the population standard deviation of the provided
+return series. It does not annualize the result and does not change the scale
+for a 1-minute or 1-hour interval. Do not compare a raw 1-minute volatility
+with a raw 1-hour volatility as if they used the same time base.
+
+### How the indicators fit together
+
+The indicators answer different kinds of questions:
+
+| Indicator | Main question |
+| --- | --- |
+| Market features | What happened during this candle? |
+| Returns | How much did price change from the previous close? |
+| SMA | What is the simple average trend? |
+| EMA | What is the recent-weighted trend? |
+| RSI | Are recent gains or losses dominating? |
+| ATR | How large are typical candle movements? |
+| MACD | How strongly are fast and slow trends separating? |
+| Volatility | How widely are percentage returns spread? |
+
+No indicator should be used alone. A trend indicator can conflict with a
+momentum indicator, and a momentum extreme does not prove that price will
+reverse. Good analysis compares several indicators, the candle time frame,
+market data quality, and a clearly defined risk rule.
+
 ## Roadmap
 
 | Phase | Description | Status |
 |---|---|---|
 | 1 | Market Data Infrastructure | 🟢 Completed |
-| 2 | Quantitative Foundation | 🔵 Next |
+| 2 | Quantitative Foundation | 🟢 Completed |
 | 3 | Backtesting Engine | Pending |
 | 4 | Strategy Development | Pending |
 | 5 | Risk Management | Pending |
@@ -264,6 +580,33 @@ provides:
   finds missing closed candles after the latest stored open time.
 - `detectMissingCandlesInRange(openTimes, startTime, endTime, duration)` —
   checks an exact aligned time range, excluding the current open candle.
+
+### Quantitative services
+
+The worker package provides database-facing functions that fetch closed candles
+and return the latest indicator values:
+
+- `getLatestMarketFeatures(symbol, interval, limit)` loads recent candles and
+  returns OHLC, percentage, range, body, wick, and volume features.
+- `getMovingAverages(symbol, interval, periods)` loads enough candles for the
+  requested periods and returns the latest SMA and EMA for each period.
+- `getHistoricalVolatility(symbol, interval, limit)` loads recent candles,
+  calculates percentage returns, and returns their population standard
+  deviation.
+- `getATR(symbol, interval, period)` loads `period + 1` candles and returns
+  the latest smoothed ATR value.
+- `getMACD(symbol, interval, fastPeriod, slowPeriod, signalPeriod)` loads
+  enough candles for the default or custom periods and returns the latest
+  MACD line, signal line, and histogram.
+
+The underlying formulas live in
+`apps/worker/src/quantative/` and are separate from Prisma queries. This makes
+the formulas reusable and easier to test. The services map `1m`, `5m`, and
+`1h` to the database's `M1`, `M5`, and `H1` interval names.
+
+Manual indicator checks are available in
+`apps/worker/src/services/tests/` for market features, moving averages,
+volatility, ATR, and MACD.
 
 ### Recovery and repair functions
 
@@ -447,6 +790,8 @@ pnpm exec turbo dev
 The worker contains manual scripts under `apps/worker/src/clients/tests`,
 `apps/worker/src/services/tests`, and `apps/worker/src/utils/tests`. They cover
 BINANCE REST/collector behavior, database and range quality, repair/recovery,
-WebSocket behavior, and retry behavior. They are TypeScript files intended for
-direct execution or future test-runner integration; they are not exposed as
-workspace test scripts and should not be treated as an automated suite.
+WebSocket behavior, retry behavior, and the market features, moving averages,
+historical volatility, ATR, and MACD indicators. They are TypeScript files
+intended for direct execution or future test-runner integration; they are not
+exposed as workspace test scripts and should not be treated as an automated
+suite.

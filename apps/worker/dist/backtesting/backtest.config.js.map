@@ -1,0 +1,1 @@
+{"version":3,"file":"backtest.config.js","sourceRoot":"","sources":["../../src/backtesting/backtest.config.ts"],"names":[],"mappings":"AAYA,MAAM,CAAC,MAAM,qBAAqB,GAAmB;IACnD,cAAc,EAAE,IAAI;IAEpB,OAAO,EAAE,KAAK;IACd,YAAY,EAAE,MAAM;IAEpB,YAAY,EAAE,IAAI;IAClB,gBAAgB,EAAE,CAAC;IACnB,YAAY,EAAE,IAAI;IAClB,WAAW,EAAE,IAAI;CAClB,CAAC"}

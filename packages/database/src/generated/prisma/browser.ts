@@ -22,3 +22,18 @@ export * from './enums.js';
  * 
  */
 export type Candle = Prisma.CandleModel
+/**
+ * Model BacktestRun
+ * 
+ */
+export type BacktestRun = Prisma.BacktestRunModel
+/**
+ * Model PaperAccount
+ * 
+ */
+export type PaperAccount = Prisma.PaperAccountModel
+/**
+ * Model PaperTrade
+ * 
+ */
+export type PaperTrade = Prisma.PaperTradeModel

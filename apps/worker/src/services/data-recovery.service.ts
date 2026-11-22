@@ -4,7 +4,7 @@
  */
 import { findLatest } from "@trafind/database";
 import { collectAndSaveHistoricalData } from "./historical-data.service.js";
-import { BinanceInterval } from "../types/market.types.js";
+import { BinanceInterval, BinanceMarketType } from "../types/market.types.js";
 
 
 const INTERVAL_DURATION: Record<BinanceInterval, number> = {
@@ -16,11 +16,13 @@ const INTERVAL_DURATION: Record<BinanceInterval, number> = {
 interface RecoveryParams {
   symbol: string;
   interval: BinanceInterval;
+  marketType?: BinanceMarketType;
 }
 
 export async function recoverMissingCandles({
   symbol,
-  interval
+  interval,
+  marketType = "SPOT"
 }: RecoveryParams) {
   console.log("Starting data recovery...");
 
@@ -32,7 +34,8 @@ export async function recoverMissingCandles({
 
   const latestCandle = await findLatest(
     symbol,
-    dbInterval[interval]
+    dbInterval[interval],
+    marketType
   );
 
   if (!latestCandle) {
@@ -54,6 +57,7 @@ export async function recoverMissingCandles({
   console.log("Recovering candles:", {
     symbol,
     interval,
+    marketType,
     from: new Date(startTime).toISOString(),
     to: new Date(endTime).toISOString()
   });

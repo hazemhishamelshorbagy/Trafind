@@ -55,6 +55,7 @@ export type CandleSumAggregateOutputType = {
 export type CandleMinAggregateOutputType = {
   id: bigint | null
   symbol: string | null
+  marketType: $Enums.MarketType | null
   interval: $Enums.CandleInterval | null
   openTime: Date | null
   closeTime: Date | null
@@ -73,6 +74,7 @@ export type CandleMinAggregateOutputType = {
 export type CandleMaxAggregateOutputType = {
   id: bigint | null
   symbol: string | null
+  marketType: $Enums.MarketType | null
   interval: $Enums.CandleInterval | null
   openTime: Date | null
   closeTime: Date | null
@@ -91,6 +93,7 @@ export type CandleMaxAggregateOutputType = {
 export type CandleCountAggregateOutputType = {
   id: number
   symbol: number
+  marketType: number
   interval: number
   openTime: number
   closeTime: number
@@ -137,6 +140,7 @@ export type CandleSumAggregateInputType = {
 export type CandleMinAggregateInputType = {
   id?: true
   symbol?: true
+  marketType?: true
   interval?: true
   openTime?: true
   closeTime?: true
@@ -155,6 +159,7 @@ export type CandleMinAggregateInputType = {
 export type CandleMaxAggregateInputType = {
   id?: true
   symbol?: true
+  marketType?: true
   interval?: true
   openTime?: true
   closeTime?: true
@@ -173,6 +178,7 @@ export type CandleMaxAggregateInputType = {
 export type CandleCountAggregateInputType = {
   id?: true
   symbol?: true
+  marketType?: true
   interval?: true
   openTime?: true
   closeTime?: true
@@ -278,6 +284,7 @@ export type CandleGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 export type CandleGroupByOutputType = {
   id: bigint
   symbol: string
+  marketType: $Enums.MarketType
   interval: $Enums.CandleInterval
   openTime: Date
   closeTime: Date
@@ -319,6 +326,7 @@ export type CandleWhereInput = {
   NOT?: Prisma.CandleWhereInput | Prisma.CandleWhereInput[]
   id?: Prisma.BigIntFilter<"Candle"> | bigint | number
   symbol?: Prisma.StringFilter<"Candle"> | string
+  marketType?: Prisma.EnumMarketTypeFilter<"Candle"> | $Enums.MarketType
   interval?: Prisma.EnumCandleIntervalFilter<"Candle"> | $Enums.CandleInterval
   openTime?: Prisma.DateTimeFilter<"Candle"> | Date | string
   closeTime?: Prisma.DateTimeFilter<"Candle"> | Date | string
@@ -337,6 +345,7 @@ export type CandleWhereInput = {
 export type CandleOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   symbol?: Prisma.SortOrder
+  marketType?: Prisma.SortOrder
   interval?: Prisma.SortOrder
   openTime?: Prisma.SortOrder
   closeTime?: Prisma.SortOrder
@@ -354,11 +363,12 @@ export type CandleOrderByWithRelationInput = {
 
 export type CandleWhereUniqueInput = Prisma.AtLeast<{
   id?: bigint | number
-  symbol_interval_openTime?: Prisma.CandleSymbolIntervalOpenTimeCompoundUniqueInput
+  symbol_marketType_interval_openTime?: Prisma.CandleSymbolMarketTypeIntervalOpenTimeCompoundUniqueInput
   AND?: Prisma.CandleWhereInput | Prisma.CandleWhereInput[]
   OR?: Prisma.CandleWhereInput[]
   NOT?: Prisma.CandleWhereInput | Prisma.CandleWhereInput[]
   symbol?: Prisma.StringFilter<"Candle"> | string
+  marketType?: Prisma.EnumMarketTypeFilter<"Candle"> | $Enums.MarketType
   interval?: Prisma.EnumCandleIntervalFilter<"Candle"> | $Enums.CandleInterval
   openTime?: Prisma.DateTimeFilter<"Candle"> | Date | string
   closeTime?: Prisma.DateTimeFilter<"Candle"> | Date | string
@@ -372,11 +382,12 @@ export type CandleWhereUniqueInput = Prisma.AtLeast<{
   takerBuyBaseVolume?: Prisma.DecimalFilter<"Candle"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   takerBuyQuoteVolume?: Prisma.DecimalFilter<"Candle"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"Candle"> | Date | string
-}, "id" | "symbol_interval_openTime">
+}, "id" | "symbol_marketType_interval_openTime">
 
 export type CandleOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   symbol?: Prisma.SortOrder
+  marketType?: Prisma.SortOrder
   interval?: Prisma.SortOrder
   openTime?: Prisma.SortOrder
   closeTime?: Prisma.SortOrder
@@ -403,6 +414,7 @@ export type CandleScalarWhereWithAggregatesInput = {
   NOT?: Prisma.CandleScalarWhereWithAggregatesInput | Prisma.CandleScalarWhereWithAggregatesInput[]
   id?: Prisma.BigIntWithAggregatesFilter<"Candle"> | bigint | number
   symbol?: Prisma.StringWithAggregatesFilter<"Candle"> | string
+  marketType?: Prisma.EnumMarketTypeWithAggregatesFilter<"Candle"> | $Enums.MarketType
   interval?: Prisma.EnumCandleIntervalWithAggregatesFilter<"Candle"> | $Enums.CandleInterval
   openTime?: Prisma.DateTimeWithAggregatesFilter<"Candle"> | Date | string
   closeTime?: Prisma.DateTimeWithAggregatesFilter<"Candle"> | Date | string
@@ -421,6 +433,7 @@ export type CandleScalarWhereWithAggregatesInput = {
 export type CandleCreateInput = {
   id?: bigint | number
   symbol: string
+  marketType?: $Enums.MarketType
   interval: $Enums.CandleInterval
   openTime: Date | string
   closeTime: Date | string
@@ -439,6 +452,7 @@ export type CandleCreateInput = {
 export type CandleUncheckedCreateInput = {
   id?: bigint | number
   symbol: string
+  marketType?: $Enums.MarketType
   interval: $Enums.CandleInterval
   openTime: Date | string
   closeTime: Date | string
@@ -457,6 +471,7 @@ export type CandleUncheckedCreateInput = {
 export type CandleUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  marketType?: Prisma.EnumMarketTypeFieldUpdateOperationsInput | $Enums.MarketType
   interval?: Prisma.EnumCandleIntervalFieldUpdateOperationsInput | $Enums.CandleInterval
   openTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closeTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -475,6 +490,7 @@ export type CandleUpdateInput = {
 export type CandleUncheckedUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  marketType?: Prisma.EnumMarketTypeFieldUpdateOperationsInput | $Enums.MarketType
   interval?: Prisma.EnumCandleIntervalFieldUpdateOperationsInput | $Enums.CandleInterval
   openTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closeTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -493,6 +509,7 @@ export type CandleUncheckedUpdateInput = {
 export type CandleCreateManyInput = {
   id?: bigint | number
   symbol: string
+  marketType?: $Enums.MarketType
   interval: $Enums.CandleInterval
   openTime: Date | string
   closeTime: Date | string
@@ -511,6 +528,7 @@ export type CandleCreateManyInput = {
 export type CandleUpdateManyMutationInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  marketType?: Prisma.EnumMarketTypeFieldUpdateOperationsInput | $Enums.MarketType
   interval?: Prisma.EnumCandleIntervalFieldUpdateOperationsInput | $Enums.CandleInterval
   openTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closeTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -529,6 +547,7 @@ export type CandleUpdateManyMutationInput = {
 export type CandleUncheckedUpdateManyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  marketType?: Prisma.EnumMarketTypeFieldUpdateOperationsInput | $Enums.MarketType
   interval?: Prisma.EnumCandleIntervalFieldUpdateOperationsInput | $Enums.CandleInterval
   openTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closeTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -544,8 +563,9 @@ export type CandleUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type CandleSymbolIntervalOpenTimeCompoundUniqueInput = {
+export type CandleSymbolMarketTypeIntervalOpenTimeCompoundUniqueInput = {
   symbol: string
+  marketType: $Enums.MarketType
   interval: $Enums.CandleInterval
   openTime: Date | string
 }
@@ -553,6 +573,7 @@ export type CandleSymbolIntervalOpenTimeCompoundUniqueInput = {
 export type CandleCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   symbol?: Prisma.SortOrder
+  marketType?: Prisma.SortOrder
   interval?: Prisma.SortOrder
   openTime?: Prisma.SortOrder
   closeTime?: Prisma.SortOrder
@@ -584,6 +605,7 @@ export type CandleAvgOrderByAggregateInput = {
 export type CandleMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   symbol?: Prisma.SortOrder
+  marketType?: Prisma.SortOrder
   interval?: Prisma.SortOrder
   openTime?: Prisma.SortOrder
   closeTime?: Prisma.SortOrder
@@ -602,6 +624,7 @@ export type CandleMaxOrderByAggregateInput = {
 export type CandleMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   symbol?: Prisma.SortOrder
+  marketType?: Prisma.SortOrder
   interval?: Prisma.SortOrder
   openTime?: Prisma.SortOrder
   closeTime?: Prisma.SortOrder
@@ -642,6 +665,10 @@ export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
+export type EnumMarketTypeFieldUpdateOperationsInput = {
+  set?: $Enums.MarketType
+}
+
 export type EnumCandleIntervalFieldUpdateOperationsInput = {
   set?: $Enums.CandleInterval
 }
@@ -671,6 +698,7 @@ export type IntFieldUpdateOperationsInput = {
 export type CandleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   symbol?: boolean
+  marketType?: boolean
   interval?: boolean
   openTime?: boolean
   closeTime?: boolean
@@ -689,6 +717,7 @@ export type CandleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type CandleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   symbol?: boolean
+  marketType?: boolean
   interval?: boolean
   openTime?: boolean
   closeTime?: boolean
@@ -707,6 +736,7 @@ export type CandleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type CandleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   symbol?: boolean
+  marketType?: boolean
   interval?: boolean
   openTime?: boolean
   closeTime?: boolean
@@ -725,6 +755,7 @@ export type CandleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type CandleSelectScalar = {
   id?: boolean
   symbol?: boolean
+  marketType?: boolean
   interval?: boolean
   openTime?: boolean
   closeTime?: boolean
@@ -740,7 +771,7 @@ export type CandleSelectScalar = {
   createdAt?: boolean
 }
 
-export type CandleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "symbol" | "interval" | "openTime" | "closeTime" | "open" | "high" | "low" | "close" | "volume" | "quoteAssetVolume" | "numberOfTrades" | "takerBuyBaseVolume" | "takerBuyQuoteVolume" | "createdAt", ExtArgs["result"]["candle"]>
+export type CandleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "symbol" | "marketType" | "interval" | "openTime" | "closeTime" | "open" | "high" | "low" | "close" | "volume" | "quoteAssetVolume" | "numberOfTrades" | "takerBuyBaseVolume" | "takerBuyQuoteVolume" | "createdAt", ExtArgs["result"]["candle"]>
 
 export type $CandlePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Candle"
@@ -748,6 +779,7 @@ export type $CandlePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
     symbol: string
+    marketType: $Enums.MarketType
     interval: $Enums.CandleInterval
     openTime: Date
     closeTime: Date
@@ -1186,6 +1218,7 @@ export interface Prisma__CandleClient<T, Null = never, ExtArgs extends runtime.T
 export interface CandleFieldRefs {
   readonly id: Prisma.FieldRef<"Candle", 'BigInt'>
   readonly symbol: Prisma.FieldRef<"Candle", 'String'>
+  readonly marketType: Prisma.FieldRef<"Candle", 'MarketType'>
   readonly interval: Prisma.FieldRef<"Candle", 'CandleInterval'>
   readonly openTime: Prisma.FieldRef<"Candle", 'DateTime'>
   readonly closeTime: Prisma.FieldRef<"Candle", 'DateTime'>

@@ -6,6 +6,21 @@ export {
   saveMany,
   findLatest,
   findCandleOpenTimes,
-  findLatestCandles
+  findLatestCandles,
+  findCandlesByTimeRange
 } from "./repositories/candle.repository.js";
+export {
+  saveBacktestRun,
+  findBacktestRun,
+  findLatestBacktestRuns
+} from "./repositories/backtest.repository.js";
+export {
+  createPaperAccount,
+  listPaperAccounts,
+  findPaperAccount,
+  findActivePaperAccounts,
+  setPaperAccountStatus,
+  commitPaperCandle
+} from "./repositories/paper-trading.repository.js";
+export { PaperAccountStatus } from "./generated/prisma/enums.js";
 export { prisma } from "./client.js";

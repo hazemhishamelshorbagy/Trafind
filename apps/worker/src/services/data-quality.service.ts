@@ -3,7 +3,10 @@
  * Why: Provides the quality measurements needed to decide whether data repair is necessary.
  */
 import { findCandleOpenTimes } from "@trafind/database";
-import { BinanceInterval } from "../types/market.types.js";
+import {
+  BinanceInterval,
+  BinanceMarketType
+} from "../types/market.types.js";
 export function detectMissingCandles(
   openTimes: Date[],
   intervalDuration: number,
@@ -74,6 +77,7 @@ const INTERVAL_DURATION: Record<BinanceInterval, number> = {
 interface CheckDatabaseParams {
   symbol: string;
   interval: BinanceInterval;
+  marketType?: BinanceMarketType;
   startTime: Date;
   endTime: Date;
 }
@@ -83,6 +87,7 @@ export async function checkDatabaseCandleQuality({
   interval,
   startTime,
   endTime,
+  marketType = "SPOT",
 }: CheckDatabaseParams) {
   if (!areCandleDatesValid([startTime, endTime]) || startTime > endTime) {
     throw new Error("Invalid date range");
@@ -93,6 +98,7 @@ export async function checkDatabaseCandleQuality({
     INTERVAL_MAP[interval],
     startTime,
     endTime,
+    marketType,
   );
 
   const openTimes = candles.map((candle) => candle.openTime);

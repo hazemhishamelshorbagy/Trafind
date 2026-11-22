@@ -1,3 +1,7 @@
+/**
+ * What: Defines the API health-check route.
+ * Why: Gives monitoring tools a simple endpoint for API liveness.
+ */
 import { Router } from "express";
 const router = Router();
 router.get("/health", (req, res) => {

@@ -5,6 +5,7 @@
 import { z } from "zod";
 export const candlesQuerySchema = z.object({
     symbol: z.enum(["SOLUSDT"]),
+    marketType: z.enum(["spot", "usdm"]).default("spot"),
     interval: z
         .enum(["1m", "5m", "1h"])
         .default("1h"),

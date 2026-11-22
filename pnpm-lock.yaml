@@ -206,6 +206,12 @@ importers:
 
   apps/api:
     dependencies:
+      '@trafind/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@trafind/worker':
+        specifier: workspace:*
+        version: link:../worker
       dotenv:
         specifier: ^18.0.10
         version: 18.0.10

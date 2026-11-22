@@ -3,8 +3,11 @@
  * Why: Keeps repository input types explicit and prevents interval or field mismatches.
  */
 type CandleInterval = "M1" | "M5" | "H1";
+export type MarketType = "SPOT" | "USD_M_FUTURES";
+
 export interface SaveCandleInput {
   symbol: string;
+  marketType?: MarketType;
   interval: CandleInterval;
   openTime: Date;
   closeTime: Date;

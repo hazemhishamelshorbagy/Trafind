@@ -17,6 +17,7 @@ import { saveMany, findLatest } from "@trafind/database";
 interface HistoricalDataParams {
   symbol: string;
   interval: BinanceInterval;
+  marketType?: "SPOT" | "USD_M_FUTURES";
   startTime: number;
   endTime: number;
   resumeFromLatest?: boolean;
@@ -36,6 +37,7 @@ const INTERVAL_DURATION: Record<BinanceInterval, number> = {
 export async function collectAndSaveHistoricalData({
   symbol,
   interval,
+  marketType = "SPOT",
   startTime,
   endTime,
   resumeFromLatest = true,
@@ -46,7 +48,7 @@ export async function collectAndSaveHistoricalData({
   let totalSkipped = 0;
   const dbInterval = INTERVAL_MAP[interval];
 const latestCandle = resumeFromLatest
-  ? await findLatest(symbol, dbInterval)
+  ? await findLatest(symbol, dbInterval, marketType)
   : null;
 
 const nextStartTime = latestCandle
@@ -59,6 +61,7 @@ const effectiveStartTime = resumeFromLatest
   for await (const batch of collectHistoricalKlines({
     symbol,
     interval,
+    marketType,
     startTime: effectiveStartTime,
     endTime,
   })) {
@@ -78,6 +81,7 @@ const effectiveStartTime = resumeFromLatest
     const databaseCandles = validCandles.map((candle) => ({
       ...candle,
       interval: INTERVAL_MAP[candle.interval],
+      marketType,
     }));
 
     const saved = await saveMany(databaseCandles);

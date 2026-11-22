@@ -14,6 +14,8 @@ import {
 } from "../validators/candle.validator.js";
 
 import { saveMany } from "@trafind/database";
+import { BinanceMarketType } from "../types/market.types.js";
+import { processActivePaperAccounts } from "../paper-trading/paper-trading.service.js";
 
 const INTERVAL_MAP = {
   "1m": "M1",
@@ -22,7 +24,8 @@ const INTERVAL_MAP = {
 } as const;
 
 export async function processLiveCandle(
-  message: BinanceWebSocketMessage
+  message: BinanceWebSocketMessage,
+  marketType: BinanceMarketType = "SPOT"
 ) {
   // Ignore updates until the candle is closed.
   if (!message.k.x) return;
@@ -42,7 +45,8 @@ export async function processLiveCandle(
 
   const databaseCandle = {
     ...candle,
-    interval: INTERVAL_MAP[candle.interval]
+    interval: INTERVAL_MAP[candle.interval],
+    marketType
   };
 
  const saved = await retry(
@@ -55,9 +59,14 @@ export async function processLiveCandle(
 
   console.log("Closed candle processed:", {
     symbol: candle.symbol,
+    marketType,
     interval: candle.interval,
     openTime: candle.openTime.toISOString(),
     close: candle.close,
     saved
   });
+
+  if (candle.interval === "1h") {
+    await processActivePaperAccounts(candle.symbol, marketType);
+  }
 }

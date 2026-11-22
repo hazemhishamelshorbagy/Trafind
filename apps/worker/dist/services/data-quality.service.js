@@ -48,11 +48,11 @@ const INTERVAL_DURATION = {
     "5m": 300_000,
     "1h": 3_600_000,
 };
-export async function checkDatabaseCandleQuality({ symbol, interval, startTime, endTime, }) {
+export async function checkDatabaseCandleQuality({ symbol, interval, startTime, endTime, marketType = "SPOT", }) {
     if (!areCandleDatesValid([startTime, endTime]) || startTime > endTime) {
         throw new Error("Invalid date range");
     }
-    const candles = await findCandleOpenTimes(symbol, INTERVAL_MAP[interval], startTime, endTime);
+    const candles = await findCandleOpenTimes(symbol, INTERVAL_MAP[interval], startTime, endTime, marketType);
     const openTimes = candles.map((candle) => candle.openTime);
     const missingCandles = detectMissingCandlesInRange(openTimes, startTime, endTime, INTERVAL_DURATION[interval]);
     return {

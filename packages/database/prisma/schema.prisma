@@ -16,9 +16,35 @@ enum CandleInterval {
   H1
 }
 
+enum MarketType {
+  SPOT
+  USD_M_FUTURES
+}
+
+enum PaperAccountStatus {
+  ACTIVE
+  PAUSED
+}
+
+enum PaperSignalAction {
+  BUY
+  SELL
+}
+
+enum PaperTradeAction {
+  BUY
+  SELL
+  FUNDING
+}
+
+enum PaperMarginMode {
+  ISOLATED
+}
+
 model Candle {
   id                 BigInt         @id @default(autoincrement())
   symbol             String         @db.VarChar(20)
+  marketType         MarketType     @default(SPOT)
   interval           CandleInterval
 
   openTime           DateTime       @db.Timestamptz(3)
@@ -37,7 +63,84 @@ model Candle {
 
   createdAt          DateTime       @default(now()) @db.Timestamptz(3)
 
-  @@unique([symbol, interval, openTime])
-  @@index([symbol, interval, openTime(sort: Desc)])
+  @@unique([symbol, marketType, interval, openTime])
+  @@index([symbol, marketType, interval, openTime(sort: Desc)])
   @@map("candles")
+}
+
+model BacktestRun {
+  id                 String         @id @default(uuid()) @db.Uuid
+  symbol             String         @db.VarChar(20)
+  marketType         MarketType     @default(SPOT)
+  interval           CandleInterval
+  strategyName       String         @db.VarChar(100)
+  startTime          DateTime       @db.Timestamptz(3)
+  endTimeExclusive   DateTime       @db.Timestamptz(3)
+  initialCapital     Decimal        @db.Decimal(30, 12)
+  finalEquity        Decimal        @db.Decimal(30, 12)
+  totalCandles       Int
+  tradeCount         Int
+  configuration      Json
+  performance        Json
+  result             Json
+  createdAt          DateTime       @default(now()) @db.Timestamptz(3)
+
+  @@index([symbol, marketType, interval, createdAt(sort: Desc)])
+  @@map("backtest_runs")
+}
+
+model PaperAccount {
+  id                    String             @id @default(uuid()) @db.Uuid
+  name                  String             @unique @db.VarChar(60)
+  symbol                String             @default("SOLUSDT") @db.VarChar(20)
+  marketType            MarketType
+  interval              CandleInterval     @default(H1)
+  strategyName          String             @default("EMA Trend Pullback") @db.VarChar(100)
+  status                PaperAccountStatus @default(ACTIVE)
+  marginMode            PaperMarginMode?
+  initialCapital        Decimal            @db.Decimal(30, 12)
+  cash                  Decimal            @db.Decimal(30, 12)
+  assetQuantity         Decimal            @default(0) @db.Decimal(30, 12)
+  averageEntryPrice     Decimal?           @db.Decimal(30, 12)
+  stopLossPrice         Decimal?           @db.Decimal(30, 12)
+  isolatedMargin        Decimal            @default(0) @db.Decimal(30, 12)
+  realizedPnl           Decimal            @default(0) @db.Decimal(30, 12)
+  equity                Decimal            @db.Decimal(30, 12)
+  lastMarkPrice         Decimal?           @db.Decimal(30, 12)
+  peakEquity            Decimal            @db.Decimal(30, 12)
+  dailyStartingEquity   Decimal            @db.Decimal(30, 12)
+  currentDay            String             @db.VarChar(10)
+  pendingAction         PaperSignalAction?
+  pendingReason         String?            @db.VarChar(200)
+  pendingStopLoss       Decimal?           @db.Decimal(30, 12)
+  pendingSignalOpenTime DateTime?          @db.Timestamptz(3)
+  lastProcessedOpenTime DateTime?          @db.Timestamptz(3)
+  leverage              Int                @default(1)
+  feeRate               Decimal            @default(0.001) @db.Decimal(10, 8)
+  slippageRate          Decimal            @default(0.0005) @db.Decimal(10, 8)
+  createdAt             DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime           @updatedAt @db.Timestamptz(3)
+  trades                PaperTrade[]
+
+  @@index([status, marketType, symbol])
+  @@map("paper_accounts")
+}
+
+model PaperTrade {
+  id              String           @id @default(uuid()) @db.Uuid
+  accountId       String           @db.Uuid
+  candleOpenTime  DateTime         @db.Timestamptz(3)
+  action          PaperTradeAction
+  executionPrice  Decimal          @db.Decimal(30, 12)
+  quantity        Decimal          @db.Decimal(30, 12)
+  fee             Decimal          @db.Decimal(30, 12)
+  fundingAmount   Decimal          @default(0) @db.Decimal(30, 12)
+  realizedPnl     Decimal          @db.Decimal(30, 12)
+  reason          String           @db.VarChar(200)
+  createdAt       DateTime         @default(now()) @db.Timestamptz(3)
+  account         PaperAccount     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, candleOpenTime, action])
+  @@index([accountId, createdAt(sort: Desc)])
+  @@map("paper_trades")
 }

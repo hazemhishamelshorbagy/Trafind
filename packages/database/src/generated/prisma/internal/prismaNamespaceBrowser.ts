@@ -51,7 +51,10 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  Candle: 'Candle'
+  Candle: 'Candle',
+  BacktestRun: 'BacktestRun',
+  PaperAccount: 'PaperAccount',
+  PaperTrade: 'PaperTrade'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -73,6 +76,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const CandleScalarFieldEnum = {
   id: 'id',
   symbol: 'symbol',
+  marketType: 'marketType',
   interval: 'interval',
   openTime: 'openTime',
   closeTime: 'closeTime',
@@ -91,6 +95,80 @@ export const CandleScalarFieldEnum = {
 export type CandleScalarFieldEnum = (typeof CandleScalarFieldEnum)[keyof typeof CandleScalarFieldEnum]
 
 
+export const BacktestRunScalarFieldEnum = {
+  id: 'id',
+  symbol: 'symbol',
+  marketType: 'marketType',
+  interval: 'interval',
+  strategyName: 'strategyName',
+  startTime: 'startTime',
+  endTimeExclusive: 'endTimeExclusive',
+  initialCapital: 'initialCapital',
+  finalEquity: 'finalEquity',
+  totalCandles: 'totalCandles',
+  tradeCount: 'tradeCount',
+  configuration: 'configuration',
+  performance: 'performance',
+  result: 'result',
+  createdAt: 'createdAt'
+} as const
+
+export type BacktestRunScalarFieldEnum = (typeof BacktestRunScalarFieldEnum)[keyof typeof BacktestRunScalarFieldEnum]
+
+
+export const PaperAccountScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  symbol: 'symbol',
+  marketType: 'marketType',
+  interval: 'interval',
+  strategyName: 'strategyName',
+  status: 'status',
+  marginMode: 'marginMode',
+  initialCapital: 'initialCapital',
+  cash: 'cash',
+  assetQuantity: 'assetQuantity',
+  averageEntryPrice: 'averageEntryPrice',
+  stopLossPrice: 'stopLossPrice',
+  isolatedMargin: 'isolatedMargin',
+  realizedPnl: 'realizedPnl',
+  equity: 'equity',
+  lastMarkPrice: 'lastMarkPrice',
+  peakEquity: 'peakEquity',
+  dailyStartingEquity: 'dailyStartingEquity',
+  currentDay: 'currentDay',
+  pendingAction: 'pendingAction',
+  pendingReason: 'pendingReason',
+  pendingStopLoss: 'pendingStopLoss',
+  pendingSignalOpenTime: 'pendingSignalOpenTime',
+  lastProcessedOpenTime: 'lastProcessedOpenTime',
+  leverage: 'leverage',
+  feeRate: 'feeRate',
+  slippageRate: 'slippageRate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaperAccountScalarFieldEnum = (typeof PaperAccountScalarFieldEnum)[keyof typeof PaperAccountScalarFieldEnum]
+
+
+export const PaperTradeScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  candleOpenTime: 'candleOpenTime',
+  action: 'action',
+  executionPrice: 'executionPrice',
+  quantity: 'quantity',
+  fee: 'fee',
+  fundingAmount: 'fundingAmount',
+  realizedPnl: 'realizedPnl',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type PaperTradeScalarFieldEnum = (typeof PaperTradeScalarFieldEnum)[keyof typeof PaperTradeScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -99,10 +177,34 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

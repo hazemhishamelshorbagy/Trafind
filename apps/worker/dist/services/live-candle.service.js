@@ -7,12 +7,13 @@ import { retry } from "../utils/retry.js";
 import { mapBinanceKline } from "../mappers/binance.mapper.js";
 import { validateCandle } from "../validators/candle.validator.js";
 import { saveMany } from "@trafind/database";
+import { processActivePaperAccounts } from "../paper-trading/paper-trading.service.js";
 const INTERVAL_MAP = {
     "1m": "M1",
     "5m": "M5",
     "1h": "H1"
 };
-export async function processLiveCandle(message) {
+export async function processLiveCandle(message, marketType = "SPOT") {
     // Ignore updates until the candle is closed.
     if (!message.k.x)
         return;
@@ -24,7 +25,8 @@ export async function processLiveCandle(message) {
     }
     const databaseCandle = {
         ...candle,
-        interval: INTERVAL_MAP[candle.interval]
+        interval: INTERVAL_MAP[candle.interval],
+        marketType
     };
     const saved = await retry(() => saveMany([databaseCandle]), {
         retries: 2,
@@ -32,10 +34,14 @@ export async function processLiveCandle(message) {
     });
     console.log("Closed candle processed:", {
         symbol: candle.symbol,
+        marketType,
         interval: candle.interval,
         openTime: candle.openTime.toISOString(),
         close: candle.close,
         saved
     });
+    if (candle.interval === "1h") {
+        await processActivePaperAccounts(candle.symbol, marketType);
+    }
 }
 //# sourceMappingURL=live-candle.service.js.map

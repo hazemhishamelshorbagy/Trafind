@@ -3,27 +3,21 @@
  * Why: Keeps HTTP request construction and response validation out of collection services.
  */
 import { retry } from "../utils/retry.js";
-import type { GetKlinesParams, BinanceKline } from "../types/market.types.js";
+import type {
+  BinanceKline,
+  BinanceMarketType,
+  GetKlinesParams
+} from "../types/market.types.js";
 const REQUEST_TIMEOUT = 10_000;
-const BINANCE_BASE_URL = "https://data-api.binance.vision";
 
-class BinanceApiError extends Error {
-  constructor(
-    public readonly status: number,
-    statusText: string
-  ) {
-    super(`Binance API error: ${status} ${statusText}`);
-    this.name = "BinanceApiError";
-  }
-}
-
-export async function getKlines({
+export function buildBinanceKlinesUrl({
   symbol,
   interval,
+  marketType = "SPOT",
   limit = 1000,
   startTime,
   endTime
-}: GetKlinesParams): Promise<BinanceKline[]> {
+}: GetKlinesParams) {
   const params = new URLSearchParams({
     symbol,
     interval,
@@ -38,7 +32,39 @@ export async function getKlines({
     params.set("endTime", String(endTime));
   }
 
-  const url = `${BINANCE_BASE_URL}/api/v3/klines?${params}`;
+  const endpoint = marketType === "SPOT"
+    ? "https://data-api.binance.vision/api/v3/klines"
+    : "https://fapi.binance.com/fapi/v1/klines";
+
+  return `${endpoint}?${params}`;
+}
+
+class BinanceApiError extends Error {
+  constructor(
+    public readonly status: number,
+    statusText: string
+  ) {
+    super(`Binance API error: ${status} ${statusText}`);
+    this.name = "BinanceApiError";
+  }
+}
+
+export async function getKlines({
+  symbol,
+  interval,
+  marketType = "SPOT",
+  limit = 1000,
+  startTime,
+  endTime
+}: GetKlinesParams): Promise<BinanceKline[]> {
+  const url = buildBinanceKlinesUrl({
+    symbol,
+    interval,
+    marketType,
+    limit,
+    startTime,
+    endTime
+  });
 
   const response = await retry(
     async () => {

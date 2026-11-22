@@ -1,6 +1,6 @@
 /**
- * What: Runs a data-repair task on an interval and guards against overlap.
- * Why: Provides recurring maintenance while supporting graceful in-progress shutdown.
+ * What: Runs recurring worker tasks with overlap protection.
+ * Why: Prevents concurrent executions and supports graceful shutdown.
  */
 interface SchedulerOptions {
     intervalMs: number;

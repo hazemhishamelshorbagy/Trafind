@@ -1,4 +1,4 @@
-import { BinanceInterval } from "../types/market.types.js";
+import { BinanceInterval, BinanceMarketType } from "../types/market.types.js";
 export declare function detectMissingCandles(openTimes: Date[], intervalDuration: number): Date[];
 export declare function areCandleTimesSorted(openTimes: Date[]): boolean;
 export declare function areCandleDatesValid(openTimes: Date[]): boolean;
@@ -6,10 +6,11 @@ export declare function checkCandleData(openTimes: Date[], intervalDuration: num
 interface CheckDatabaseParams {
     symbol: string;
     interval: BinanceInterval;
+    marketType?: BinanceMarketType;
     startTime: Date;
     endTime: Date;
 }
-export declare function checkDatabaseCandleQuality({ symbol, interval, startTime, endTime, }: CheckDatabaseParams): Promise<{
+export declare function checkDatabaseCandleQuality({ symbol, interval, startTime, endTime, marketType, }: CheckDatabaseParams): Promise<{
     symbol: string;
     interval: BinanceInterval;
     checkedCandles: number;

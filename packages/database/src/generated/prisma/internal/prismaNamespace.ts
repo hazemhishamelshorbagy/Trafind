@@ -397,7 +397,10 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
-  Candle: 'Candle'
+  Candle: 'Candle',
+  BacktestRun: 'BacktestRun',
+  PaperAccount: 'PaperAccount',
+  PaperTrade: 'PaperTrade'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -413,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "candle"
+    modelProps: "candle" | "backtestRun" | "paperAccount" | "paperTrade"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -491,6 +494,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    BacktestRun: {
+      payload: Prisma.$BacktestRunPayload<ExtArgs>
+      fields: Prisma.BacktestRunFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BacktestRunFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BacktestRunFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>
+        }
+        findFirst: {
+          args: Prisma.BacktestRunFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BacktestRunFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>
+        }
+        findMany: {
+          args: Prisma.BacktestRunFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>[]
+        }
+        create: {
+          args: Prisma.BacktestRunCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>
+        }
+        createMany: {
+          args: Prisma.BacktestRunCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BacktestRunCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>[]
+        }
+        delete: {
+          args: Prisma.BacktestRunDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>
+        }
+        update: {
+          args: Prisma.BacktestRunUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>
+        }
+        deleteMany: {
+          args: Prisma.BacktestRunDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BacktestRunUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BacktestRunUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>[]
+        }
+        upsert: {
+          args: Prisma.BacktestRunUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>
+        }
+        aggregate: {
+          args: Prisma.BacktestRunAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBacktestRun>
+        }
+        groupBy: {
+          args: Prisma.BacktestRunGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BacktestRunGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BacktestRunCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BacktestRunCountAggregateOutputType> | number
+        }
+      }
+    }
+    PaperAccount: {
+      payload: Prisma.$PaperAccountPayload<ExtArgs>
+      fields: Prisma.PaperAccountFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaperAccountFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperAccountPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaperAccountFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperAccountPayload>
+        }
+        findFirst: {
+          args: Prisma.PaperAccountFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperAccountPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaperAccountFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperAccountPayload>
+        }
+        findMany: {
+          args: Prisma.PaperAccountFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperAccountPayload>[]
+        }
+        create: {
+          args: Prisma.PaperAccountCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperAccountPayload>
+        }
+        createMany: {
+          args: Prisma.PaperAccountCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PaperAccountCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperAccountPayload>[]
+        }
+        delete: {
+          args: Prisma.PaperAccountDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperAccountPayload>
+        }
+        update: {
+          args: Prisma.PaperAccountUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperAccountPayload>
+        }
+        deleteMany: {
+          args: Prisma.PaperAccountDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaperAccountUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PaperAccountUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperAccountPayload>[]
+        }
+        upsert: {
+          args: Prisma.PaperAccountUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperAccountPayload>
+        }
+        aggregate: {
+          args: Prisma.PaperAccountAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaperAccount>
+        }
+        groupBy: {
+          args: Prisma.PaperAccountGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaperAccountGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaperAccountCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaperAccountCountAggregateOutputType> | number
+        }
+      }
+    }
+    PaperTrade: {
+      payload: Prisma.$PaperTradePayload<ExtArgs>
+      fields: Prisma.PaperTradeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaperTradeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperTradePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaperTradeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperTradePayload>
+        }
+        findFirst: {
+          args: Prisma.PaperTradeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperTradePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaperTradeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperTradePayload>
+        }
+        findMany: {
+          args: Prisma.PaperTradeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperTradePayload>[]
+        }
+        create: {
+          args: Prisma.PaperTradeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperTradePayload>
+        }
+        createMany: {
+          args: Prisma.PaperTradeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PaperTradeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperTradePayload>[]
+        }
+        delete: {
+          args: Prisma.PaperTradeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperTradePayload>
+        }
+        update: {
+          args: Prisma.PaperTradeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperTradePayload>
+        }
+        deleteMany: {
+          args: Prisma.PaperTradeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaperTradeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PaperTradeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperTradePayload>[]
+        }
+        upsert: {
+          args: Prisma.PaperTradeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperTradePayload>
+        }
+        aggregate: {
+          args: Prisma.PaperTradeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaperTrade>
+        }
+        groupBy: {
+          args: Prisma.PaperTradeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaperTradeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaperTradeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaperTradeCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -533,6 +758,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const CandleScalarFieldEnum = {
   id: 'id',
   symbol: 'symbol',
+  marketType: 'marketType',
   interval: 'interval',
   openTime: 'openTime',
   closeTime: 'closeTime',
@@ -551,6 +777,80 @@ export const CandleScalarFieldEnum = {
 export type CandleScalarFieldEnum = (typeof CandleScalarFieldEnum)[keyof typeof CandleScalarFieldEnum]
 
 
+export const BacktestRunScalarFieldEnum = {
+  id: 'id',
+  symbol: 'symbol',
+  marketType: 'marketType',
+  interval: 'interval',
+  strategyName: 'strategyName',
+  startTime: 'startTime',
+  endTimeExclusive: 'endTimeExclusive',
+  initialCapital: 'initialCapital',
+  finalEquity: 'finalEquity',
+  totalCandles: 'totalCandles',
+  tradeCount: 'tradeCount',
+  configuration: 'configuration',
+  performance: 'performance',
+  result: 'result',
+  createdAt: 'createdAt'
+} as const
+
+export type BacktestRunScalarFieldEnum = (typeof BacktestRunScalarFieldEnum)[keyof typeof BacktestRunScalarFieldEnum]
+
+
+export const PaperAccountScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  symbol: 'symbol',
+  marketType: 'marketType',
+  interval: 'interval',
+  strategyName: 'strategyName',
+  status: 'status',
+  marginMode: 'marginMode',
+  initialCapital: 'initialCapital',
+  cash: 'cash',
+  assetQuantity: 'assetQuantity',
+  averageEntryPrice: 'averageEntryPrice',
+  stopLossPrice: 'stopLossPrice',
+  isolatedMargin: 'isolatedMargin',
+  realizedPnl: 'realizedPnl',
+  equity: 'equity',
+  lastMarkPrice: 'lastMarkPrice',
+  peakEquity: 'peakEquity',
+  dailyStartingEquity: 'dailyStartingEquity',
+  currentDay: 'currentDay',
+  pendingAction: 'pendingAction',
+  pendingReason: 'pendingReason',
+  pendingStopLoss: 'pendingStopLoss',
+  pendingSignalOpenTime: 'pendingSignalOpenTime',
+  lastProcessedOpenTime: 'lastProcessedOpenTime',
+  leverage: 'leverage',
+  feeRate: 'feeRate',
+  slippageRate: 'slippageRate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaperAccountScalarFieldEnum = (typeof PaperAccountScalarFieldEnum)[keyof typeof PaperAccountScalarFieldEnum]
+
+
+export const PaperTradeScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  candleOpenTime: 'candleOpenTime',
+  action: 'action',
+  executionPrice: 'executionPrice',
+  quantity: 'quantity',
+  fee: 'fee',
+  fundingAmount: 'fundingAmount',
+  realizedPnl: 'realizedPnl',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type PaperTradeScalarFieldEnum = (typeof PaperTradeScalarFieldEnum)[keyof typeof PaperTradeScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -559,12 +859,36 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 
@@ -598,6 +922,20 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
  * Reference to a field of type 'String[]'
  */
 export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
+    
+
+
+/**
+ * Reference to a field of type 'MarketType'
+ */
+export type EnumMarketTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MarketType'>
+    
+
+
+/**
+ * Reference to a field of type 'MarketType[]'
+ */
+export type ListEnumMarketTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MarketType[]'>
     
 
 
@@ -654,6 +992,76 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'PaperAccountStatus'
+ */
+export type EnumPaperAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaperAccountStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PaperAccountStatus[]'
+ */
+export type ListEnumPaperAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaperAccountStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PaperMarginMode'
+ */
+export type EnumPaperMarginModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaperMarginMode'>
+    
+
+
+/**
+ * Reference to a field of type 'PaperMarginMode[]'
+ */
+export type ListEnumPaperMarginModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaperMarginMode[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PaperSignalAction'
+ */
+export type EnumPaperSignalActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaperSignalAction'>
+    
+
+
+/**
+ * Reference to a field of type 'PaperSignalAction[]'
+ */
+export type ListEnumPaperSignalActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaperSignalAction[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PaperTradeAction'
+ */
+export type EnumPaperTradeActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaperTradeAction'>
+    
+
+
+/**
+ * Reference to a field of type 'PaperTradeAction[]'
+ */
+export type ListEnumPaperTradeActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaperTradeAction[]'>
     
 
 
@@ -822,6 +1230,9 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   candle?: Prisma.CandleOmit
+  backtestRun?: Prisma.BacktestRunOmit
+  paperAccount?: Prisma.PaperAccountOmit
+  paperTrade?: Prisma.PaperTradeOmit
 }
 
 /* Types for Logging */

@@ -3,6 +3,7 @@
  * Why: Gives ingestion code a consistent, typed contract for external market data.
  */
 export type BinanceInterval = "1m" | "5m" | "1h";
+export type BinanceMarketType = "SPOT" | "USD_M_FUTURES";
 
 export type BinanceKline = [
   number, // Open time
@@ -22,6 +23,7 @@ export type BinanceKline = [
 export interface GetKlinesParams {
   symbol: string;
   interval: BinanceInterval;
+  marketType?: BinanceMarketType;
   limit?: number;
   startTime?: number;
   endTime?: number;
@@ -48,6 +50,7 @@ export type MappedCandle= {
 export interface HistoricalDataParams {
   symbol: string;
   interval: BinanceInterval;
+  marketType?: BinanceMarketType;
   startTime: number;
   endTime: number;
 }

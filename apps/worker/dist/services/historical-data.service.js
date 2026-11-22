@@ -16,14 +16,14 @@ const INTERVAL_DURATION = {
     "5m": 300_000,
     "1h": 3_600_000,
 };
-export async function collectAndSaveHistoricalData({ symbol, interval, startTime, endTime, resumeFromLatest = true, }) {
+export async function collectAndSaveHistoricalData({ symbol, interval, marketType = "SPOT", startTime, endTime, resumeFromLatest = true, }) {
     let totalReceived = 0;
     let totalValid = 0;
     let totalSaved = 0;
     let totalSkipped = 0;
     const dbInterval = INTERVAL_MAP[interval];
     const latestCandle = resumeFromLatest
-        ? await findLatest(symbol, dbInterval)
+        ? await findLatest(symbol, dbInterval, marketType)
         : null;
     const nextStartTime = latestCandle
         ? latestCandle.openTime.getTime() + INTERVAL_DURATION[interval]
@@ -34,6 +34,7 @@ export async function collectAndSaveHistoricalData({ symbol, interval, startTime
     for await (const batch of collectHistoricalKlines({
         symbol,
         interval,
+        marketType,
         startTime: effectiveStartTime,
         endTime,
     })) {
@@ -45,6 +46,7 @@ export async function collectAndSaveHistoricalData({ symbol, interval, startTime
         const databaseCandles = validCandles.map((candle) => ({
             ...candle,
             interval: INTERVAL_MAP[candle.interval],
+            marketType,
         }));
         const saved = await saveMany(databaseCandles);
         totalSaved += saved;

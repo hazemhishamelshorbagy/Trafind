@@ -9,14 +9,14 @@ const INTERVAL_DURATION = {
     "5m": 300_000,
     "1h": 3_600_000
 };
-export async function recoverMissingCandles({ symbol, interval }) {
+export async function recoverMissingCandles({ symbol, interval, marketType = "SPOT" }) {
     console.log("Starting data recovery...");
     const dbInterval = {
         "1m": "M1",
         "5m": "M5",
         "1h": "H1"
     };
-    const latestCandle = await findLatest(symbol, dbInterval[interval]);
+    const latestCandle = await findLatest(symbol, dbInterval[interval], marketType);
     if (!latestCandle) {
         console.warn("No historical data found. Recovery skipped.");
         return;
@@ -31,6 +31,7 @@ export async function recoverMissingCandles({ symbol, interval }) {
     console.log("Recovering candles:", {
         symbol,
         interval,
+        marketType,
         from: new Date(startTime).toISOString(),
         to: new Date(endTime).toISOString()
     });

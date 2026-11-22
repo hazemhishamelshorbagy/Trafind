@@ -1,11 +1,12 @@
 import { checkDatabaseCandleQuality } from "./data-quality.service.js";
 import { collectAndSaveHistoricalData } from "./historical-data.service.js";
-export async function repairMissingCandles({ symbol, interval, startTime, endTime }) {
+export async function repairMissingCandles({ symbol, interval, marketType = "SPOT", startTime, endTime }) {
     console.log("Starting data repair...");
     // Step 1: Detect missing candles.
     const qualityResult = await checkDatabaseCandleQuality({
         symbol,
         interval,
+        marketType,
         startTime,
         endTime
     });
@@ -26,6 +27,7 @@ export async function repairMissingCandles({ symbol, interval, startTime, endTim
     const recoveryResult = await collectAndSaveHistoricalData({
         symbol,
         interval,
+        marketType,
         startTime: missingCandles[0].getTime(),
         endTime: missingCandles[missingCandles.length - 1].getTime(),
         resumeFromLatest: false
@@ -34,6 +36,7 @@ export async function repairMissingCandles({ symbol, interval, startTime, endTim
     const verificationResult = await checkDatabaseCandleQuality({
         symbol,
         interval,
+        marketType,
         startTime,
         endTime
     });

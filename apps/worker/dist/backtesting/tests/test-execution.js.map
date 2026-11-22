@@ -1,0 +1,1 @@
+{"version":3,"file":"test-execution.js","sourceRoot":"","sources":["../../../src/backtesting/tests/test-execution.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,iBAAiB,EAAE,MAAM,2BAA2B,CAAC;AAE9D,MAAM,MAAM,GAAG,iBAAiB,CAC9B,MAAM,EACN,GAAG,EACH,KAAK,EACL,CAAC,EACD,KAAK,CACN,CAAC;AAEF,OAAO,CAAC,GAAG,CAAC,mBAAmB,EAAE,MAAM,CAAC,CAAC"}

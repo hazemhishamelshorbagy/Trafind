@@ -3,28 +3,20 @@
  * Why: Keeps API startup wiring separate from the server process entry point.
  */
 import express from "express";
-import { env } from "./config/env.js";
 import healthRouter from "./routes/health.routes.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { notFoundHandler } from "./middleware/not-found.js";
 import marketRouter from "./routes/market.routes.js";
+import backtestRouter from "./routes/backtest.routes.js";
+import paperTradingRouter from "./routes/paper-trading.routes.js";
 const app = express();
 
-const PORT = env.PORT;
-
-// Middleware
 app.use(express.json());
-
-// Health Check
 app.use("/api", healthRouter);
 app.use("/api/market", marketRouter);
-
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Trafind API running on port ${PORT}`);
-});
-// 404 Not Found Middleware
+app.use("/api/backtests", backtestRouter);
+app.use("/api/paper-trading", paperTradingRouter);
 app.use(notFoundHandler);
-// global  error middle ware
 app.use(errorHandler);
+
 export default app;

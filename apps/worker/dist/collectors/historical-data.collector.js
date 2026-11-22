@@ -4,12 +4,13 @@
  */
 import { getKlines, } from "../clients/binance.client.js";
 import { INTERVAL_DURATION } from "../types/market.types.js";
-export async function* collectHistoricalKlines({ symbol, interval, startTime, endTime }) {
+export async function* collectHistoricalKlines({ symbol, interval, marketType, startTime, endTime }) {
     let currentStartTime = startTime;
     while (currentStartTime <= endTime) {
         const batch = await getKlines({
             symbol,
             interval,
+            marketType,
             limit: 1000,
             startTime: currentStartTime,
             endTime

@@ -12,6 +12,7 @@ import { BinanceKline, HistoricalDataParams, INTERVAL_DURATION } from "../types/
 export async function* collectHistoricalKlines({
   symbol,
   interval,
+  marketType,
   startTime,
   endTime
 }: HistoricalDataParams): AsyncGenerator<BinanceKline[]> {
@@ -21,6 +22,7 @@ export async function* collectHistoricalKlines({
     const batch = await getKlines({
       symbol,
       interval,
+      marketType,
       limit: 1000,
       startTime: currentStartTime,
       endTime

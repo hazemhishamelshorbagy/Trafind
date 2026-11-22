@@ -9,4 +9,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Candle.js'
+export type * from './models/BacktestRun.js'
+export type * from './models/PaperAccount.js'
+export type * from './models/PaperTrade.js'
 export type * from './commonInputTypes.js'

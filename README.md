@@ -1,14 +1,13 @@
 # Trafind
 
-Trafind is a TypeScript market-data ingestion system for collecting and
-repairing Binance cryptocurrency candles. It is a pnpm/Turborepo workspace
-that stores raw OHLCV market data in PostgreSQL through Prisma and exposes an
-Express API for health checks and market-data query validation.
+Trafind is a TypeScript trading research backend. It collects and repairs
+Binance candles, stores Spot and USDⓈ-M Futures data separately in PostgreSQL,
+and exposes market-data and backtesting APIs.
 
 The completed pipeline currently covers:
 
 - Historical candle collection from Binance
-- Closed-candle live WebSocket collection
+- Closed-candle live WebSocket collection for Spot and USDⓈ-M Futures
 - Candle mapping and validation
 - PostgreSQL storage with duplicate protection
 - Missing-candle detection and automatic repair
@@ -20,10 +19,10 @@ The completed pipeline currently covers:
 - Average True Range (ATR)
 - MACD and its signal and histogram
 - Historical volatility and percentage returns
+- EMA Trend Pullback backtesting, benchmark comparison, and persisted run history
 
-The indicator modules are calculated from closed candle data in PostgreSQL.
-Pattern discovery, hypothesis testing, and backtesting are described in
-[docs/cycle.md](docs/cycle.md) but are not implemented yet.
+Paper trading is not implemented yet. Backtest results are research outputs,
+not evidence that the strategy is ready for live trading.
 
 ## Project status
 
@@ -31,16 +30,18 @@ Pattern discovery, hypothesis testing, and backtesting are described in
 
 - Binance REST klines collection in batches of up to 1,000 candles
 - REST request retries, retry filtering, and 10-second request timeouts
-- Binance WebSocket collection for closed `SOLUSDT` 1-minute candles
+- Binance Spot and USDⓈ-M Futures WebSocket collection for closed `SOLUSDT`
+  candles
 - Conversion of Binance arrays and WebSocket messages into normalized candle
   objects
 - Validation of prices, volume, OHLC relationships, dates, and closed status
 - PostgreSQL persistence with a unique constraint for
-  `(symbol, interval, openTime)`
+  `(symbol, marketType, interval, openTime)`
 - Historical, range, trailing-gap, and database-quality checks
-- Automatic startup repair and a periodic repair scheduler
+- Automatic startup repair and a periodic repair scheduler for Spot 1m and
+  Spot/Futures 1h data
 - Graceful worker shutdown for `SIGINT` and `SIGTERM`
-- API health endpoint and market-candle query validation
+- API health endpoint and database-backed market-candle queries
 - Candle price, range, wick, and volume features
 - Percentage returns
 - Simple Moving Average (SMA)
@@ -50,15 +51,14 @@ Pattern discovery, hypothesis testing, and backtesting are described in
 - Moving Average Convergence Divergence (MACD)
 - Population-standard-deviation historical volatility
 
-### Current API and worker boundaries
+### Current boundaries
 
-- The market-candle endpoint validates input and echoes it; it does not yet
-  query PostgreSQL.
-- The worker's main entry point performs data repair. The Binance WebSocket
-  client is implemented, but `connectBinanceWebSocket()` is not called by the
-  main entry point.
-- Live ingestion, recovery, and the repair scheduler are wired behind worker
-  services and can be enabled or exercised separately.
+- The worker currently ingests SOLUSDT Spot 1m and Spot/USDⓈ-M Futures 1h
+  candles; it does not place exchange orders.
+- The market-candle endpoint reads the selected market from PostgreSQL.
+- EMA Trend Pullback backtesting is Spot-only. Futures funding, margin, and
+  liquidation simulation are not part of the backtest engine yet.
+- Paper trading, authentication, and live trading are not implemented.
 - There is no configured end-to-end test runner yet. Source files under `tests`
   directories are manual TypeScript test scripts.
 
@@ -433,6 +433,7 @@ Prisma stores market candles in the `candles` table.
 | --- | --- |
 | `id` | Auto-incrementing database identifier |
 | `symbol` | Market symbol, for example `SOLUSDT` |
+| `marketType` | `SPOT` or `USD_M_FUTURES` |
 | `interval` | Prisma enum: `M1`, `M5`, or `H1` |
 | `openTime` | UTC candle opening timestamp |
 | `closeTime` | UTC candle closing timestamp |
@@ -444,8 +445,9 @@ Prisma stores market candles in the `candles` table.
 | `takerBuyQuoteVolume` | Taker-buy quote volume |
 | `createdAt` | Database insertion timestamp |
 
-The unique constraint prevents duplicate candles for the same symbol,
-interval, and open time. `saveMany()` additionally uses Prisma's
+The unique constraint prevents duplicate candles for the same symbol, market,
+interval, and open time. Existing rows were migrated as `SPOT`. `saveMany()`
+defaults omitted market types to `SPOT` and additionally uses Prisma's
 `skipDuplicates` option for idempotent batch inserts.
 
 Supported interval mappings:
@@ -464,9 +466,11 @@ Supported interval mappings:
 and process-signal handling:
 
 - Verifies 30 days of `SOLUSDT` `1m` history at startup.
+- Verifies 30 days of `SOLUSDT` `1h` history for both Spot and USDⓈ-M Futures.
+- Starts Spot 1m, Spot 1h, and USDⓈ-M Futures 1h WebSocket feeds.
 - Throws if missing candles remain after the initial repair attempt.
 - Starts a repair cycle every five minutes.
-- Checks and repairs the latest 24 hours of data in each scheduled cycle.
+- Checks and repairs the latest 24 hours of Spot 1m and Spot/Futures 1h data.
 - Stops the scheduler and disconnects Prisma when `SIGINT` or `SIGTERM` is
   received.
 
@@ -475,7 +479,8 @@ and process-signal handling:
 `getKlines()` in
 [apps/worker/src/clients/binance.client.ts](apps/worker/src/clients/binance.client.ts):
 
-- Calls Binance's public market-data endpoint.
+- Calls Binance's public Spot or USDⓈ-M Futures market-data endpoint according
+  to `marketType` (`SPOT` by default).
 - Builds symbol, interval, limit, start time, and end time query parameters.
 - Defaults to a page limit of 1,000 candles.
 - Uses a 10-second request timeout.
@@ -552,7 +557,8 @@ rejects candles with:
 `connectBinanceWebSocket()` in
 [apps/worker/src/clients/binance-websocket.client.ts](apps/worker/src/clients/binance-websocket.client.ts):
 
-- Connects to the `SOLUSDT@kline_1m` Binance WebSocket stream.
+- Connects to the selected Spot or USDⓈ-M Futures kline stream; the worker
+  starts `SOLUSDT` Spot 1m, Spot 1h, and USDⓈ-M Futures 1h streams.
 - Runs data recovery after each connection opens.
 - Buffers closed messages while recovery is running.
 - Processes the buffered messages only after recovery completes.
@@ -675,7 +681,7 @@ Returns:
 - A fixed success message
 - An ISO-8601 timestamp
 
-### Market candle validation
+### Market candles
 
 `GET /api/market/candles`
 
@@ -685,18 +691,55 @@ Example:
 GET /api/market/candles?symbol=SOLUSDT&interval=1h&limit=100
 ```
 
+Use `marketType=spot` (default) or `marketType=usdm` to select the market:
+
+```text
+GET /api/market/candles?symbol=SOLUSDT&marketType=usdm&interval=1h&limit=100
+```
+
 `candlesQuerySchema` in
 [apps/api/src/schemas/validation-schema.ts](apps/api/src/schemas/validation-schema.ts)
 validates and defaults:
 
 - `symbol`: exactly `SOLUSDT`
+- `marketType`: `spot` or `usdm`; defaults to `spot`
 - `interval`: `1m`, `5m`, or `1h`; defaults to `1h`
 - `limit`: integer from 1 to 1000; coerced from the query string; defaults to
   100
 
-`getCandles()` validates the request and returns the selected values. Invalid
-input returns HTTP 400 with Zod issue details. This endpoint does not read
-candles from PostgreSQL yet.
+`getCandles()` validates the request and returns the latest matching candle
+records from PostgreSQL. The response includes the selected symbol, market type, and interval,
+the number of returned candles, and each candle's ISO timestamps and numeric
+OHLCV fields. A valid query with no matching records returns an empty candle
+array. Invalid input returns HTTP 400 with Zod issue details; database errors
+are logged and returned as HTTP 500.
+
+### Backtest API
+
+`POST /api/backtests` runs and stores an EMA Trend Pullback Spot backtest.
+
+```json
+{
+  "symbol": "SOLUSDT",
+  "startTime": "2026-06-01T00:00:00Z",
+  "endTimeExclusive": "2026-06-11T00:00:00Z",
+  "initialCapital": 1000
+}
+```
+
+The range is hour-aligned UTC, start-inclusive/end-exclusive, and limited to
+201 hours through 180 days. This includes 200 candles for EMA warm-up and a
+following candle on which the first signal can execute. The API rejects
+incomplete candle ranges instead of backtesting across gaps. A successful
+response contains a persisted run ID,
+trade/equity details, performance metrics, and a fee/slippage-adjusted
+buy-and-hold benchmark.
+
+- `GET /api/backtests?limit=20` returns the most recent run summaries.
+- `GET /api/backtests/:id` returns a saved run and its full result.
+
+Each run is stored in the `backtest_runs` table. This endpoint runs
+synchronously and is bounded to 180 days; it does not place live orders.
 
 The API also includes:
 
@@ -740,13 +783,19 @@ The API also includes:
    pnpm --filter @trafind/database migrate:dev
    ```
 
-4. Start the API:
+4. Build the worker package. The API imports the compiled backtesting modules:
+
+   ```sh
+   pnpm --filter @trafind/worker build
+   ```
+
+5. Start the API:
 
    ```sh
    pnpm --filter @trafind/api dev
    ```
 
-5. Start the worker:
+6. Start the worker:
 
    ```sh
    pnpm --filter @trafind/worker dev
@@ -795,3 +844,30 @@ historical volatility, ATR, and MACD indicators. They are TypeScript files
 intended for direct execution or future test-runner integration; they are not
 exposed as workspace test scripts and should not be treated as an automated
 suite.
+
+The EMA Trend Pullback strategy has an offline unit script and a database-backed
+six-month H1 backtest:
+
+```powershell
+pnpm exec tsx apps/worker/src/backtesting/tests/test-ema-trend-pullback.unit.ts
+pnpm exec tsx apps/worker/src/backtesting/tests/test-cost-adjusted-risk.ts
+pnpm exec tsx apps/worker/src/backtesting/tests/test-ema-trend-pullback.strategy.ts
+```
+
+The integration script requires `DATABASE_URL` in
+`packages/database/.env` and 4,320 contiguous `SOLUSDT` H1 candles. It stops
+instead of reporting results if its historical data has gaps. Position sizing
+includes estimated entry/stop slippage and trading fees; stop gaps can still
+cause realized losses to exceed the planned per-trade risk.
+
+For a selected range, use hour-aligned UTC timestamps. The start is inclusive,
+the end is exclusive, and the range cannot exceed 180 days:
+
+```powershell
+pnpm exec tsx --env-file=packages/database/.env apps/worker/src/backtesting/tests/test-range-backtest.ts --start=2026-06-01T00:00:00Z --end=2026-06-11T00:00:00Z
+```
+
+This runner rejects missing or misaligned candles and reports the strategy
+alongside an all-in buy-and-hold benchmark with the same fee/slippage settings.
+The example dates are a smoke-test range from the already reviewed period, not
+an out-of-sample evaluation. Use a separate, untouched date range for OOS.

@@ -16,3 +16,43 @@ export const CandleInterval = {
 } as const
 
 export type CandleInterval = (typeof CandleInterval)[keyof typeof CandleInterval]
+
+
+export const MarketType = {
+  SPOT: 'SPOT',
+  USD_M_FUTURES: 'USD_M_FUTURES'
+} as const
+
+export type MarketType = (typeof MarketType)[keyof typeof MarketType]
+
+
+export const PaperAccountStatus = {
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED'
+} as const
+
+export type PaperAccountStatus = (typeof PaperAccountStatus)[keyof typeof PaperAccountStatus]
+
+
+export const PaperSignalAction = {
+  BUY: 'BUY',
+  SELL: 'SELL'
+} as const
+
+export type PaperSignalAction = (typeof PaperSignalAction)[keyof typeof PaperSignalAction]
+
+
+export const PaperTradeAction = {
+  BUY: 'BUY',
+  SELL: 'SELL',
+  FUNDING: 'FUNDING'
+} as const
+
+export type PaperTradeAction = (typeof PaperTradeAction)[keyof typeof PaperTradeAction]
+
+
+export const PaperMarginMode = {
+  ISOLATED: 'ISOLATED'
+} as const
+
+export type PaperMarginMode = (typeof PaperMarginMode)[keyof typeof PaperMarginMode]

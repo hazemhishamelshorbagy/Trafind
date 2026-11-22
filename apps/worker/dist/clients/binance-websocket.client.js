@@ -5,13 +5,20 @@
 import WebSocket from "ws";
 import { processLiveCandle } from "../services/live-candle.service.js";
 import { recoverMissingCandles } from "../services/data-recovery.service.js";
-const BINANCE_WS_URL = "wss://stream.binance.com:9443/ws/solusdt@kline_1m";
-let connectionId = 0;
-let recoveryPromise = null;
 const INITIAL_RECONNECT_DELAY = 1_000;
 const MAX_RECONNECT_DELAY = 30_000;
 const HEARTBEAT_INTERVAL = 30_000;
-export function connectBinanceWebSocket() {
+export function buildBinanceWebSocketUrl({ symbol = "SOLUSDT", interval = "1m", marketType = "SPOT" } = {}) {
+    const streamHost = marketType === "SPOT"
+        ? "stream.binance.com:9443"
+        : "fstream.binance.com";
+    return `wss://${streamHost}/ws/${symbol.toLowerCase()}@kline_${interval}`;
+}
+export function connectBinanceWebSocket(options = {}) {
+    const { symbol = "SOLUSDT", interval = "1m", marketType = "SPOT" } = options;
+    const binanceWsUrl = buildBinanceWebSocketUrl(options);
+    let connectionId = 0;
+    let recoveryPromise = null;
     let socket = null;
     let reconnectTimer = null;
     let heartbeatTimer = null;
@@ -24,7 +31,7 @@ export function connectBinanceWebSocket() {
             const message = messageBuffer.shift();
             if (!message)
                 continue;
-            await processLiveCandle(message);
+            await processLiveCandle(message, marketType);
         }
     }
     async function startRecovery(currentConnectionId) {
@@ -41,8 +48,9 @@ export function connectBinanceWebSocket() {
             }
             console.log("Starting data recovery...");
             const currentRecovery = recoverMissingCandles({
-                symbol: "SOLUSDT",
-                interval: "1m"
+                symbol,
+                interval,
+                marketType
             });
             recoveryPromise = currentRecovery;
             try {
@@ -76,7 +84,7 @@ export function connectBinanceWebSocket() {
         if (!shouldReconnect)
             return;
         console.log("Connecting to Binance...");
-        socket = new WebSocket(BINANCE_WS_URL);
+        socket = new WebSocket(binanceWsUrl);
         let isAlive = true;
         socket.on("open", () => {
             console.log("Connected to Binance!");
@@ -109,7 +117,7 @@ export function connectBinanceWebSocket() {
                     }
                     return;
                 }
-                void processLiveCandle(message).catch((error) => {
+                void processLiveCandle(message, marketType).catch((error) => {
                     console.error("Failed to process live candle:", error);
                 });
             }

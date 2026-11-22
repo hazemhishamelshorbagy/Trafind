@@ -4,16 +4,7 @@
  */
 import { retry } from "../utils/retry.js";
 const REQUEST_TIMEOUT = 10_000;
-const BINANCE_BASE_URL = "https://data-api.binance.vision";
-class BinanceApiError extends Error {
-    status;
-    constructor(status, statusText) {
-        super(`Binance API error: ${status} ${statusText}`);
-        this.status = status;
-        this.name = "BinanceApiError";
-    }
-}
-export async function getKlines({ symbol, interval, limit = 1000, startTime, endTime }) {
+export function buildBinanceKlinesUrl({ symbol, interval, marketType = "SPOT", limit = 1000, startTime, endTime }) {
     const params = new URLSearchParams({
         symbol,
         interval,
@@ -25,7 +16,28 @@ export async function getKlines({ symbol, interval, limit = 1000, startTime, end
     if (endTime !== undefined) {
         params.set("endTime", String(endTime));
     }
-    const url = `${BINANCE_BASE_URL}/api/v3/klines?${params}`;
+    const endpoint = marketType === "SPOT"
+        ? "https://data-api.binance.vision/api/v3/klines"
+        : "https://fapi.binance.com/fapi/v1/klines";
+    return `${endpoint}?${params}`;
+}
+class BinanceApiError extends Error {
+    status;
+    constructor(status, statusText) {
+        super(`Binance API error: ${status} ${statusText}`);
+        this.status = status;
+        this.name = "BinanceApiError";
+    }
+}
+export async function getKlines({ symbol, interval, marketType = "SPOT", limit = 1000, startTime, endTime }) {
+    const url = buildBinanceKlinesUrl({
+        symbol,
+        interval,
+        marketType,
+        limit,
+        startTime,
+        endTime
+    });
     const response = await retry(async () => {
         const result = await fetch(url, {
             signal: AbortSignal.timeout(REQUEST_TIMEOUT)

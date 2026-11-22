@@ -1,17 +1,27 @@
-/**
- * What: Manually runs historical collection and database saving.
- * Why: Smoke-tests collection, validation, mapping, and persistence.
- */
 import { collectAndSaveHistoricalData } from "../historical-data.service.js";
 
 async function main() {
-  const endTime = Date.now() - 60_000;
-  const startTime = endTime - 10 * 60_000;
+  const ONE_HOUR = 60 * 60 * 1000;
+  const SIX_MONTHS = 180 * 24 * ONE_HOUR;
+
+  // بداية الساعة الحالية
+  const endBoundary = Math.floor(Date.now() / ONE_HOUR) * ONE_HOUR;
+
+  // آخر شمعة H1 مكتملة
+  const endTime = endBoundary - 1;
+
+  // نبدأ من 180 يوم قبل بداية الساعة الحالية
+  const startTime = endBoundary - SIX_MONTHS;
 
   try {
+    console.log("Starting historical collection...");
+    console.log("Symbol: SOLUSDT");
+    console.log("Interval: 1h");
+    console.log("Period: 180 days");
+
     const result = await collectAndSaveHistoricalData({
       symbol: "SOLUSDT",
-      interval: "1m",
+      interval: "1h",
       startTime,
       endTime
     });
